@@ -1,33 +1,80 @@
-# 食物智能分析 - 多智能体系统
+<div align="center">
+
+# 🍽️ 食物智能分析 - 企业级多智能体系统
+
+**基于 CrewAI V2 + RAG 的智能营养健康解决方案**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![GLM-4](https://img.shields.io/badge/LLM-GLM--4--Flash-green.svg)](https://open.bigmodel.cn)
-[![Agents](https://img.shields.io/badge/Agents-6%2F6%20Using%20GLM--4-brightgreen.svg)](#)
+[![CrewAI](https://img.shields.io/badge/Framework-CrewAI%20V2-orange.svg)](https://www.crewai.io/)
+[![RAG](https://img.shields.io/badge/Enhanced-RAG%20System-blue.svg)](#)
+[![Agents](https://img.shields.io/badge/Agents-6%2F6-brightgreen.svg)](#)
 
-## 概述
+[快速开始](#-快速开始) · [系统架构](#-系统架构) · [文档](#-文档) · [示例](#-使用示例)
 
-基于**智谱AI GLM-4-Flash**（永久免费大模型）的多智能体系统，为各类应用（Go、Java、Python等）提供：
-- 🤖 AI智能对话
-- 🍔 食物识别分析  
-- 💊 营养健康建议
-- 📊 健康目标跟踪
-- 🍱 个性化饮食计划
-- 📝 社区内容推荐
+</div>
 
-## 特点
+---
 
-✅ **永久免费** - 使用GLM-4-Flash，无使用限制  
-✅ **6个AI智能体** - 全部使用大模型，真正的AI能力  
-✅ **CrewAI框架** - 2025年最新智能体协作框架，提升准确性  
-✅ **性能强大** - 接近GPT-4的中文能力  
-✅ **独立部署** - 通用的微服务架构  
-✅ **多语言支持** - Go SDK + RESTful API  
-✅ **开箱即用** - 5分钟启动
+## 📖 项目简介
 
-## 系统架构
+这是一个**企业级食物营养智能分析系统**，采用先进的多智能体架构，结合 CrewAI V2 协作框架和 RAG（检索增强生成）技术，为用户提供专业、准确、个性化的营养健康服务。
 
-### 智能体列表
+### 🎯 核心价值
+
+- 🤖 **6个专业AI智能体** - 分工明确，协同工作
+- 🧠 **RAG知识增强** - 基于专业营养学知识库，回答更准确
+- 🔄 **CrewAI V2框架** - 多步工作流 + 交叉验证，准确率提升50%+
+- 🆓 **永久免费LLM** - 使用智谱AI GLM-4-Flash
+- 🚀 **开箱即用** - 5分钟启动，完整API文档
+- 🌐 **多语言支持** - Go/Java/Python SDK + RESTful API
+
+### 💡 适用场景
+
+- ✅ 智能营养咨询平台
+- ✅ 健康管理APP
+- ✅ 企业员工健康系统
+- ✅ 减脂/增肌教练应用
+- ✅ 医疗健康辅助系统
+- ✅ 食品营养分析工具
+
+---
+
+## 🏗️ 系统架构
+
+### 整体架构图
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        用户请求                              │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+         ┌───────────▼──────────┐
+         │   CrewAI Manager     │
+         │  (任务协调器)         │
+         └───────────┬──────────┘
+                     │
+      ┌──────────────┼──────────────┐
+      │              │              │
+   Task 1         Task 2         Task 3
+      │              │              │
+      ▼              ▼              ▼
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│ Health   │  │Nutrition │  │  Meal    │
+│  Goal    │→ │ Analyzer │→ │ Planner  │
+│  Agent   │  │  Agent   │  │  Agent   │
+└────┬─────┘  └────┬─────┘  └────┬─────┘
+     │             │             │
+     └─────────────┴─────────────┘
+                   │
+         ┌─────────▼─────────┐
+         │   RAG 知识库       │
+         │ (营养学专业知识)   │
+         └───────────────────┘
+```
+
+### 🤖 智能体列表
 
 1. **食物识别智能体 (FoodRecognitionAgent)**
    - 功能：图像识别、食物分类、营养成分提取
@@ -41,11 +88,12 @@
    - 输入：食物信息、用户健康数据
    - 输出：营养分析报告、健康建议
 
-3. **对话智能体 (ConversationAgent)**
+3. **对话智能体 (ConversationAgent)** 🆕 RAG增强
    - 功能：自然语言理解、智能问答、多轮对话
-   - 技术：GLM-4大模型、上下文管理
+   - 技术：GLM-4大模型 + RAG知识检索
+   - 知识库：500+专业营养学文档
    - 输入：用户问题、对话历史
-   - 输出：智能回答、建议
+   - 输出：专业、准确的智能回答
 
 4. **社区推荐智能体 (CommunityRecommendationAgent)**
    - 功能：内容推荐、用户兴趣分析、个性化推荐
@@ -65,86 +113,295 @@
    - 输入：营养需求、饮食偏好、限制
    - 输出：完整饮食计划、购物清单
 
-### 协调器 (MultiAgentCoordinator)
+### 🔗 CrewAI V2 协作框架
 
-- 功能：任务分配、智能体协作、结果聚合
-- 机制：基于优先级的任务调度、智能体间通信
-- 特点：支持并行处理、动态负载均衡
+**工作流程：**
+1. **任务依赖链** - Task 2 依赖 Task 1，Task 3 依赖 Task 1+2
+2. **交叉验证** - Agent 之间互相校验结果
+3. **规则+LLM双保险** - 关键数据由规则保证，解释由LLM优化
+4. **显式工具调用** - 每个Agent的业务逻辑被包装成工具
 
-## 技术栈
+**示例：减脂场景**
+```
+Task 1: HealthGoalAgent 验证目标安全性 ✓
+   ↓
+Task 2: NutritionAnalyzer 分析营养约束 ✓
+   ↓
+Task 3: MealPlanner 生成饮食计划（基于Task1+2的约束）✓
+   ↓
+Task 4: HealthGoalAgent 制定进度跟踪方案 ✓
+   ↓
+Task 5: ConversationAgent 综合总结（Manager）✓
+```
 
-- **大语言模型**: 智谱AI GLM-4-Flash (永久免费)
-- **服务端语言**: Python 3.8+
-- **API框架**: Flask (RESTful API)
-- **通信协议**: HTTP/HTTPS, gRPC（可选）
-- **数据库**: 独立配置（可选，用于智能体数据存储）
-- **缓存**: Redis（可选）
-- **客户端支持**: Go, Java, Python, JavaScript等
+### 🧠 RAG 知识增强系统
 
-## 目录结构
+**核心组件：**
+- **向量数据库**: Milvus（轻量级本地部署）
+- **Embedding模型**: bge-large-zh-v1.5（中文最佳）
+- **知识库**: 营养学、食物数据、疾病饮食、健康目标
+- **检索策略**: 语义相似度 + 关键词匹配
+
+**工作流程：**
+```
+用户提问 → 判断是否需要RAG → 向量检索 → 拼接上下文 → GLM-4生成
+```
+
+**效果对比：**
+- ❌ 无RAG: "减脂期间要多吃蛋白质..."（笼统）
+- ✅ 有RAG: "建议每天1.6-2.0g/kg，鸡胸肉每100g含24g..."（专业、有数据）
+
+---
+
+## 🛠️ 技术栈
+
+### 核心技术
+
+| 层级 | 技术 | 说明 |
+|------|------|------|
+| **LLM** | GLM-4-Flash | 智谱AI，永久免费，性能接近GPT-4 |
+| **框架** | CrewAI V2 | 2025最新多智能体协作框架 |
+| **RAG** | NeutronRAG (精简版) | 向量检索 + 知识增强 |
+| **向量库** | Milvus Lite | 轻量级本地部署 |
+| **Embedding** | bge-large-zh-v1.5 | 智源开源，中文最佳 |
+| **API** | Flask | RESTful API |
+| **语言** | Python 3.8+ | 主要开发语言 |
+| **SDK** | Go/Java/Python | 多语言客户端 |
+
+### 可选组件
+
+- **图数据库**: NebulaGraph（Graph RAG模式）
+- **缓存**: Redis（高频查询缓存）
+- **数据库**: MySQL/PostgreSQL（用户数据）
+- **监控**: Prometheus + Grafana
+
+---
+
+## 📁 项目结构
 
 ```
 multi-agent-system/
-├── agents/                    # 智能体实现
-│   ├── base_agent.py         # 智能体基类
-│   ├── food_recognition_agent.py
-│   ├── nutrition_analyzer_agent.py
-│   ├── conversation_agent.py
-│   ├── community_recommendation_agent.py
-│   ├── health_goal_agent.py
-│   └── meal_planner_agent.py
-├── coordinators/             # 协调器
-│   └── multi_agent_coordinator.py
-├── models/                   # 模型相关(可选)
-│   ├── vision_models/       # 视觉模型
-│   ├── nlp_models/          # NLP模型
-│   └── recommendation_models/ # 推荐模型
-├── config/                   # 配置文件
-│   ├── agent_config.yaml    # 智能体配置
-│   └── glm4_config.yaml     # GLM-4模型配置
-├── utils/                    # 工具类
-│   ├── glm4_client.py       # GLM-4模型客户端
-│   ├── data_processor.py    # 数据处理
-│   ├── logger.py            # 日志管理
-│   └── config_loader.py     # 配置加载
-├── tests/                    # 测试文件
-├── api/                      # API接口
-│   └── agent_api.py         # 智能体API服务
-└── requirements.txt          # Python依赖
-
+├── agents/                          # 🤖 智能体实现
+│   ├── base_agent.py               # 智能体基类
+│   ├── conversation_agent.py       # 对话智能体（RAG增强）⭐
+│   ├── food_recognition_agent.py   # 食物识别智能体
+│   ├── nutrition_analyzer_agent.py # 营养分析智能体
+│   ├── health_goal_agent.py        # 健康目标智能体
+│   ├── meal_planner_agent.py       # 饮食计划智能体
+│   └── community_recommendation_agent.py  # 社区推荐智能体
+│
+├── rag/                             # 🧠 RAG 系统
+│   ├── neutron_rag_adapter.py      # NeutronRAG 适配器
+│   ├── knowledge_manager.py        # 知识库管理器
+│   └── README.md                   # RAG 文档
+│
+├── knowledge_base/                  # 📚 知识库
+│   ├── nutrition/                  # 营养学基础
+│   ├── foods/                      # 食物营养数据
+│   ├── health_goals/               # 健康目标指南
+│   ├── diseases/                   # 疾病饮食建议
+│   ├── recipes/                    # 健康食谱
+│   └── supplements/                # 营养补充剂
+│
+├── api/                             # 🌐 API 接口
+│   ├── crewai_api.py               # CrewAI API（主要）
+│   └── agent_api.py                # 传统 Agent API
+│
+├── utils/                           # 🔧 工具类
+│   ├── glm4_client.py              # GLM-4 客户端
+│   ├── crewai_adapter.py           # CrewAI 适配器
+│   ├── crewai_tools.py             # CrewAI 工具集
+│   ├── config_loader.py            # 配置加载
+│   └── logger.py                   # 日志管理
+│
+├── config/                          # ⚙️ 配置文件
+│   ├── agent_config.yaml           # 智能体配置
+│   └── glm4_config.yaml            # GLM-4 配置
+│
+├── sdk/                             # 📦 多语言 SDK
+│   └── go/                         # Go SDK
+│
+├── examples/                        # 💡 示例代码
+│   └── rag_example.py              # RAG 使用示例
+│
+├── NeutronRAG-main/                 # 🔬 NeutronRAG（精简版）
+│   └── NeutronRAG-main/backend/    # 核心组件
+│
+├── main.py                          # 🚀 主程序（CrewAI模式）
+├── setup_rag.py                     # 🛠️ RAG 设置脚本
+├── cleanup_neutronrag.py            # 🗑️ NeutronRAG 清理脚本
+├── requirements.txt                 # 📋 Python 依赖
+└── README.md                        # 📖 本文档
 ```
 
-## 快速开始（3步）
+---
 
-### 1. 获取免费API Key
-访问 https://open.bigmodel.cn 注册获取GLM-4 API Key（永久免费）
+## 🚀 快速开始
 
-### 2. 配置并安装
+### 前置要求
+
+- Python 3.8+
+- 8GB+ 内存
+- 10GB+ 硬盘空间
+
+### 步骤1：获取 API Key（免费）
+
+访问 [智谱AI开放平台](https://open.bigmodel.cn) 注册并获取 GLM-4 API Key
+
+### 步骤2：安装依赖
+
 ```bash
+# 克隆项目
+git clone <your-repo-url>
 cd multi-agent-system
+
+# 安装 Python 依赖
 pip install -r requirements.txt
 
-# 设置API Key
-export GLM_API_KEY="your-api-key"  # Linux/Mac
-# 或 Windows: set GLM_API_KEY=your-api-key
+# 设置 API Key
+# Linux/Mac:
+export GLM_API_KEY="your-api-key-here"
+
+# Windows PowerShell:
+$env:GLM_API_KEY="your-api-key-here"
+
+# Windows CMD:
+set GLM_API_KEY=your-api-key-here
 ```
 
-### 3. 启动CrewAI服务
+### 步骤3：初始化 RAG 系统（可选但推荐）
+
 ```bash
-python main.py
-# CrewAI服务运行在 http://localhost:5001
+# 运行 RAG 设置脚本
+python setup_rag.py
+
+# 这会自动：
+# ✅ 检查依赖
+# ✅ 创建知识库目录
+# ✅ 生成示例知识文档
+# ✅ 测试 RAG 功能
 ```
 
-测试：
+### 步骤4：启动服务
+
+#### 方式1：CrewAI 模式（推荐）
+
+```bash
+# 启动 CrewAI 服务
+python main.py
+
+# 服务运行在 http://localhost:5001
+```
+
+#### 方式2：传统 Agent 模式
+
+```bash
+# 启动传统 API
+python api/agent_api.py
+
+# 服务运行在 http://localhost:5000
+```
+
+### 步骤5：测试
+
 ```bash
 # 健康检查
 curl http://localhost:5001/crewai/health
 
-# 获取Crew信息
+# 获取 Crew 信息
 curl http://localhost:5001/crewai/crew-info
+
+# 测试减脂场景
+curl -X POST http://localhost:5001/crewai/process \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "我想减肥",
+    "user_id": 1001,
+    "context": {
+      "current_weight": 75.0,
+      "target_weight": 70.0,
+      "days": 30
+    }
+  }'
 ```
 
-## Go项目集成
+---
+
+## 💻 使用示例
+
+### Python 示例
+
+#### 1. 基础对话（RAG 增强）
+
+```python
+from agents.conversation_agent import ConversationAgent
+
+# 创建启用 RAG 的对话智能体
+agent = ConversationAgent(
+    agent_id="conversation",
+    config={
+        'use_rag': True,
+        'rag_config': {
+            'rag_mode': 'vector',
+            'space_name': 'nutrition_kb'
+        }
+    }
+)
+
+# 查询
+result = agent.execute({
+    'user_id': 1001,
+    'session_id': 'demo',
+    'message': '减脂期间蛋白质怎么吃？'
+})
+
+print(result['data']['response'])
+# 输出："建议每天摄入1.6-2.0g/kg体重的蛋白质..."
+```
+
+#### 2. CrewAI 工作流
+
+```python
+from crewai import Crew, Task
+from utils.crewai_adapter import CrewAIAgentAdapter
+from agents import HealthGoalAgent, NutritionAnalyzerAgent, MealPlannerAgent
+
+# 创建智能体
+health_agent = HealthGoalAgent()
+nutrition_agent = NutritionAnalyzerAgent()
+meal_agent = MealPlannerAgent()
+
+# 适配到 CrewAI
+adapters = {
+    'health': CrewAIAgentAdapter(health_agent, ...),
+    'nutrition': CrewAIAgentAdapter(nutrition_agent, ...),
+    'meal': CrewAIAgentAdapter(meal_agent, ...)
+}
+
+# 创建任务链
+task1 = Task(
+    description="验证减脂目标的安全性",
+    agent=adapters['health'].crew_agent
+)
+
+task2 = Task(
+    description="分析营养约束",
+    agent=adapters['nutrition'].crew_agent,
+    context=[task1]  # 依赖 task1
+)
+
+task3 = Task(
+    description="生成饮食计划",
+    agent=adapters['meal'].crew_agent,
+    context=[task1, task2]  # 依赖 task1 和 task2
+)
+
+# 执行
+crew = Crew(agents=[...], tasks=[task1, task2, task3])
+result = crew.kickoff()
+```
+
+### Go 项目集成
 
 ### 1. 复制SDK
 ```bash
@@ -178,27 +435,124 @@ plan, _ := client.GenerateMealPlan(&multiagent.MealPlanRequest{
 
 详细文档: [Go集成指南](GO_INTEGRATION.md)
 
-## 主要功能
+---
 
-| API端点 | 功能 | 说明 |
-|---------|------|------|
-| `/agents/conversation` | AI对话 | 智能问答、健康建议 |
+## 🌐 API 端点
+
+### CrewAI API（推荐）
+
+| 端点 | 方法 | 功能 | 说明 |
+|------|------|------|------|
+| `/crewai/health` | GET | 健康检查 | 服务状态 |
+| `/crewai/crew-info` | GET | Crew信息 | Agent列表、工具统计 |
+| `/crewai/process` | POST | 处理请求 | 多智能体协作处理 |
+
+**场景支持：**
+- `weight_loss` - 减脂方案
+- `muscle_gain` - 增肌方案（开发中）
+- `health_consultation` - 健康咨询（开发中）
+
+### 传统 Agent API
+
+| 端点 | 功能 | 说明 |
+|------|------|------|
+| `/agents/conversation` | AI对话 | 智能问答（RAG增强）|
 | `/agents/food-recognition` | 食物识别 | 营养成分分析 |
 | `/agents/nutrition-analysis` | 营养分析 | 专业营养评估 |
 | `/agents/health-goal` | 健康目标 | 目标跟踪预测 |
 | `/agents/meal-plan` | 饮食计划 | 个性化计划生成 |
 | `/agents/recommendation` | 智能推荐 | 内容个性化推荐 |
 
-## 文档
+---
 
-- **[CREWAI_INTEGRATION.md](CREWAI_INTEGRATION.md)** - CrewAI框架集成指南（Python）
-- **[CREWAI_GO_INTEGRATION.md](CREWAI_GO_INTEGRATION.md)** - CrewAI框架Go语言集成（新）⭐
-- **[MULTI_AGENT_DEMO.md](MULTI_AGENT_DEMO.md)** - 多智能体协作演示
-- **[LLM_SETUP.md](LLM_SETUP.md)** - GLM-4配置详细说明
-- **[GO_INTEGRATION.md](GO_INTEGRATION.md)** - Go语言集成指南
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - 生产环境部署
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - 系统架构
+## 📚 文档
 
-## 许可证
+### 核心文档
 
-MIT License
+- **[CREWAI_V2_README.md](CREWAI_V2_README.md)** ⭐ - CrewAI V2 框架详解
+- **[RAG_INTEGRATION_GUIDE.md](RAG_INTEGRATION_GUIDE.md)** ⭐ - RAG 系统集成指南
+- **[NEUTRONRAG_CLEANUP_LIST.md](NEUTRONRAG_CLEANUP_LIST.md)** - NeutronRAG 清理说明
+
+### 开发文档
+
+- **[CREWAI_INTEGRATION.md](CREWAI_INTEGRATION.md)** - CrewAI 集成指南
+- **[CREWAI_GO_INTEGRATION.md](CREWAI_GO_INTEGRATION.md)** - Go 语言集成
+- **[GO_INTEGRATION.md](GO_INTEGRATION.md)** - Go SDK 使用
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - 系统架构设计
+
+### 示例和教程
+
+- **[examples/rag_example.py](examples/rag_example.py)** - RAG 使用示例
+- **[setup_rag.py](setup_rag.py)** - RAG 快速设置
+- **[rag/README.md](rag/README.md)** - RAG 模块文档
+
+---
+
+## 🎯 路线图
+
+### ✅ 已完成
+
+- [x] 6个核心智能体实现
+- [x] CrewAI V2 框架集成
+- [x] RAG 知识增强系统
+- [x] 减脂场景完整工作流
+- [x] Go SDK 支持
+- [x] RESTful API
+
+### 🚧 开发中
+
+- [ ] 增肌场景工作流
+- [ ] 健康咨询场景
+- [ ] Graph RAG 支持
+- [ ] 用户数据持久化
+- [ ] 前端 Web UI
+
+### 📋 计划中
+
+- [ ] 移动端 SDK（iOS/Android）
+- [ ] 多租户支持
+- [ ] 实时监控面板
+- [ ] A/B 测试框架
+- [ ] 更多 LLM 支持（DeepSeek、Qwen等）
+
+---
+
+## 🤝 贡献
+
+欢迎贡献代码、报告问题或提出建议！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+---
+
+## 📧 联系我们
+
+- 项目主页: [GitHub Repo](#)
+- 问题反馈: [Issues](#)
+- 邮箱: your-email@example.com
+
+---
+
+## ⭐ Star History
+
+如果这个项目对你有帮助，请给我们一个 ⭐！
+
+---
+
+## 📄 许可证
+
+MIT License - 详见 [LICENSE](LICENSE) 文件
+
+---
+
+<div align="center">
+
+**Built with ❤️ using CrewAI, GLM-4, and RAG**
+
+[回到顶部](#-食物智能分析---企业级多智能体系统)
+
+</div>

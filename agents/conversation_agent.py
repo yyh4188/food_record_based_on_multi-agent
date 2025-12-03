@@ -4,13 +4,21 @@
 支持: DeepSeek-V3, Qwen2.5, GLM-4, Gemini 2.0等
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from .base_agent import BaseAgent
 from utils.glm4_client import get_glm4_client
+
+# 尝试导入 RAG 适配器（可选）
+try:
+    from rag.neutron_rag_adapter import NeutronRAGAdapter, SimplifiedRAGAdapter
+    RAG_AVAILABLE = True
+except Exception as e:
+    RAG_AVAILABLE = False
+    print(f"⚠️ RAG 模块不可用: {e}")
 
 
 class ConversationAgent(BaseAgent):
@@ -44,7 +52,38 @@ class ConversationAgent(BaseAgent):
         # 知识库（作为后备）
         self.knowledge_base = self._init_knowledge_base()
         
-        self.logger.info("对话智能体初始化完成")
+        # 🆕 初始化 RAG 适配器（可选）
+        self.use_rag = self.config.get('use_rag', False)
+        self.rag_adapter: Optional[NeutronRAGAdapter] = None
+        
+        if self.use_rag and RAG_AVAILABLE:
+            try:
+                self.logger.info("正在初始化 NeutronRAG 适配器...")
+                rag_config = self.config.get('rag_config', {})
+                
+                self.rag_adapter = NeutronRAGAdapter(
+                    llm_model=rag_config.get('llm_model', 'glm-4-flash'),
+                    rag_mode=rag_config.get('rag_mode', 'vector'),  # vector, graph, hybrid
+                    vector_db=rag_config.get('vector_db', 'MilvusDB'),
+                    graph_db=rag_config.get('graph_db', 'nebulagraph'),
+                    space_name=rag_config.get('space_name', 'nutrition_kb'),
+                    use_rag=True
+                )
+                
+                # 延迟初始化（第一次使用时才初始化）
+                # self.rag_adapter.initialize()
+                
+                self.logger.success("✅ NeutronRAG 适配器创建成功（延迟初始化）")
+            except Exception as e:
+                self.logger.error(f"❌ NeutronRAG 适配器初始化失败: {e}")
+                self.logger.warning("将使用传统模式（无 RAG 增强）")
+                self.use_rag = False
+                self.rag_adapter = None
+        elif self.use_rag and not RAG_AVAILABLE:
+            self.logger.warning("⚠️ RAG 模块不可用，将使用传统模式")
+            self.use_rag = False
+        
+        self.logger.info(f"对话智能体初始化完成 (RAG: {'启用' if self.use_rag else '禁用'})")
     
     def _init_knowledge_base(self) -> Dict[str, List[str]]:
         """初始化知识库"""
@@ -180,8 +219,31 @@ class ConversationAgent(BaseAgent):
     ) -> str:
         """
         生成回复
-        优先使用大语言模型，降级到规则系统
+        优先级: RAG增强 > LLM > 规则系统
         """
+        # 🆕 优先使用 RAG 增强（如果启用）
+        if self.use_rag and self.rag_adapter:
+            try:
+                # 判断是否需要知识增强
+                if self._need_rag_retrieval(user_message):
+                    self.logger.info("🔍 使用 RAG 增强生成回复")
+                    rag_response = self.rag_adapter.query(
+                        question=user_message,
+                        history=history
+                    )
+                    
+                    # 获取检索结果（用于日志或调试）
+                    retrieval_results = self.rag_adapter.get_retrieval_results()
+                    if retrieval_results:
+                        self.logger.debug(f"检索到 {len(retrieval_results)} 个知识片段")
+                    
+                    return rag_response
+                else:
+                    self.logger.debug("不需要 RAG 增强，使用普通 LLM")
+            except Exception as e:
+                self.logger.error(f"RAG 增强失败，降级到普通 LLM: {e}")
+                # 继续使用普通 LLM
+        
         # 如果启用了LLM，使用大语言模型
         if self.use_llm and self.llm_client:
             try:
@@ -208,6 +270,35 @@ class ConversationAgent(BaseAgent):
             return self._get_greeting()
         else:
             return self._get_default_response(user_message)
+    
+    def _need_rag_retrieval(self, message: str) -> bool:
+        """
+        判断是否需要 RAG 知识检索
+        
+        Args:
+            message: 用户消息
+            
+        Returns:
+            是否需要检索
+        """
+        # 营养健康相关关键词
+        nutrition_keywords = [
+            '营养', '热量', '卡路里', '蛋白质', '碳水', '脂肪', '维生素', '矿物质',
+            '减肥', '减脂', '增肌', '瘦身', '健身',
+            '食物', '食材', '食谱', '饮食', '吃',
+            '糖尿病', '高血压', '高血脂', '痛风', '疾病',
+            'GI', '血糖', '胰岛素', '代谢',
+            '健康', '养生', '调理'
+        ]
+        
+        # 检查是否包含关键词
+        message_lower = message.lower()
+        for keyword in nutrition_keywords:
+            if keyword in message:
+                return True
+        
+        # 默认不使用 RAG（如闲聊、问候等）
+        return False
     
     def _get_calorie_advice(self, context: Dict[str, Any]) -> str:
         """热量相关建议"""
